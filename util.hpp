@@ -60,11 +60,4 @@ extern void write_csv(std::string filename,
 extern std::vector<std::pair<std::string, std::vector<int>>>
   read_csv(std::string filename);
 
-/*
-* @func: Reads a file and output a string
-*   @string: The file name
-*/
-extern std::string read(std::string fileName);
-
-
 #endif
