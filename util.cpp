@@ -155,22 +155,3 @@ std::vector<std::pair<std::string, std::vector<int>>> read_csv(std::string filen
 
     return result;
 }
-
-//read the string from a file -- used in auton selector
-std::string read(std::string filename) {
-  if(filename.substr(0, 5) != "/usd/") {
-     filename = "/usd/" + filename;
-  }
-  std::ifstream file (filename, std::ifstream::in);
-  std::string text;
-    if (file.good()) {
-      std::string line;
-      while(getline(file, line)){
-          text = line;
-      }
-      file.close();
-    } else {
-    text = "Red Front Option 1";
-  }
-  return text;
-}
