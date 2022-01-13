@@ -57,7 +57,7 @@ extern void write_csv(std::string filename,
 *   and then columns and rows of numbers in the Micro SD Card
 *   @string: The file name
 */
-extern std::vector<std::pair<std::string, std::vector<int>>>
+extern std::vector<std::pair<std::string, std::vector<float>>>
   read_csv(std::string filename);
 
 #endif
