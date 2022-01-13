@@ -38,7 +38,7 @@ float limit(float input, float max) {
   return output;
 }
 
-void fixFileName(std::string name) {
+std::string fixFileName(std::string name) {
   // Fix the file name to suit the Micro SD Card needs
   if(name.substr(0, 5) != "/usd/") {
      name = "/usd/" + name;
@@ -51,6 +51,8 @@ void fixFileName(std::string name) {
   if (name == ("/usd/.csv")) {
      name = "/usd/error.csv";
   }
+
+  return name;
 }
 
 void write_csv(std::string filename, std::vector<std::pair<std::string, std::vector<float>>> dataset){
@@ -61,7 +63,7 @@ void write_csv(std::string filename, std::vector<std::pair<std::string, std::vec
     // Note that all columns should be the same size
 
     // Fix the file name to suit the Micro SD Card needs
-    fixFileName(filename);
+    filename = fixFileName(filename);
 
     // Create an output filestream object
     std::ofstream myFile(filename, std::ofstream::out | std::ofstream::trunc);
@@ -90,15 +92,15 @@ void write_csv(std::string filename, std::vector<std::pair<std::string, std::vec
     myFile.close();
 }
 
-std::vector<std::pair<std::string, std::vector<int>>> read_csv(std::string filename){
+std::vector<std::pair<std::string, std::vector<float>>> read_csv(std::string filename){
     // Reads a CSV file into a vector of <string, vector<int>> pairs where
     // each pair represents <column name, column values>
 
     // Fix the file name to suit the Micro SD Card needs
-    fixFileName(filename);
+    filename = fixFileName(filename);
 
     // Create a vector of <string, int vector> pairs to store the result
-    std::vector<std::pair<std::string, std::vector<int>>> result;
+    std::vector<std::pair<std::string, std::vector<float>>> result;
 
     // Create an input filestream
     std::ifstream myFile(filename, std::ifstream::in);
@@ -108,7 +110,7 @@ std::vector<std::pair<std::string, std::vector<int>>> read_csv(std::string filen
 
     // Helper vars
     std::string line, colname;
-    int val;
+    float val;
 
     // Read the column names
     if(myFile.good())
@@ -123,7 +125,7 @@ std::vector<std::pair<std::string, std::vector<int>>> read_csv(std::string filen
         while(std::getline(ss, colname, ',')){
 
             // Initialize and add <colname, int vector> pairs to result
-            result.push_back({colname, std::vector<int> {}});
+            result.push_back({colname, std::vector<float> {}});
         }
     }
 
