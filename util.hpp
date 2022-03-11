@@ -8,15 +8,6 @@
 #include <string>
 
 /*
-* @array of all timers
-*/
-// extern int timer[10];
-//
-// enum TimerName {
-//   BALL
-// } TimerName_t;
-
-/*
 * @func: Clears all the lines on the LCD screen
 */
 extern void clearLCDLines();
