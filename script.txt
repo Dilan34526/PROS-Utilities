@@ -1,140 +1,32 @@
-body {
-    font-family: 'Roboto', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f0f0f0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-.chat-container {
-    width: 100%;
-    max-width: 600px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    height: 80vh;
-}
-
-header {
-    background-color: #4a90e2;
-    color: #ffffff;
-    padding: 20px;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-}
-
-h1 {
-    margin: 0;
-    font-size: 24px;
-}
-
-.chat-messages {
-    flex-grow: 1;
-    padding: 20px;
-    overflow-y: auto;
-}
-
-.message {
-    margin-bottom: 15px;
-    padding: 10px 15px;
-    border-radius: 20px;
-    max-width: 80%;
-}
-
-.user-message {
-    background-color: #e6f2ff;
-    align-self: flex-end;
-    margin-left: auto;
-}
-
-.bot-message {
-    background-color: #f0f0f0;
-    align-self: flex-start;
-}
-
-.chat-input-container {
-    display: flex;
-    padding: 20px;
-    border-top: 1px solid #e0e0e0;
-}
-
-#userInput {
-    flex-grow: 1;
-    padding: 10px;
-    border: 1px solid #e0e0e0;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-#sendButton {
-    background-color: #4a90e2;
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    margin-left: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-#sendButton:hover {
-    background-color: #3a7bc8;
-}
-
-.file-upload-container {
-    width: 90%;
-    max-width: 600px;
-    height: 300px;
-    border: 2px dashed #4a90e2;
-    border-radius: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 20px auto;
-}
-
-.drop-zone {
-    text-align: center;
-}
-
-.drop-zone p {
-    margin: 10px 0;
-}
-
-#selectFileButton {
-    background-color: #4a90e2;
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-#selectFileButton:hover {
-    background-color: #3a7bc8;
-}
-
-#downloadContainer {
-    text-align: center;
-    padding: 10px;
-}
-
-#downloadLink {
-    display: inline-block;
-    background-color: #4a90e2;
-    color: #ffffff;
-    text-decoration: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    margin-top: 10px;
-}
-
-#downloadLink:hover {
-    background-color: #3a7bc8;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Chatbot</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="file-upload-container" id="fileUploadArea">
+        <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
+        <div class="drop-zone">
+            <p>Drag and drop an Excel file here</p>
+            <p>or</p>
+            <button id="selectFileButton">Select File</button>
+        </div>
+    </div>
+    <div class="chat-container" style="display: none;">
+        <header>
+            <h1>Gemini Chatbot</h1>
+        </header>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-container">
+            <input type="text" id="userInput" placeholder="Type your message here...">
+            <button id="sendButton">Send</button>
+            <button id="nextQuestionButton">Next Question</button>
+        </div>
+    </div>
+    <script src="xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
