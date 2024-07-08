@@ -1,0 +1,171 @@
+const chatMessages = document.getElementById('chatMessages');
+const userInput = document.getElementById('userInput');
+const sendButton = document.getElementById('sendButton');
+const nextQuestionButton = document.getElementById('nextQuestionButton');
+const fileUploadArea = document.getElementById('fileUploadArea');
+const fileInput = document.getElementById('fileInput');
+const selectFileButton = document.getElementById('selectFileButton');
+const chatContainer = document.querySelector('.chat-container');
+
+const API_KEY = '';
+const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+
+let chatHistory = [];
+let excelData = [];
+let currentQuestionIndex = 0;
+
+function addMessage(content, isUser) {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message');
+    messageElement.classList.add(isUser ? 'user-message' : 'bot-message');
+    messageElement.textContent = content;
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    chatHistory.push({role: isUser ? 'user' : 'model', content: content});
+}
+
+async function sendMessage() {
+    const userMessage = userInput.value.trim();
+    if (userMessage === '') return;
+
+    addMessage(userMessage, true);
+    userInput.value = '';
+
+    try {
+        const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: chatHistory.map(msg => ({
+                    role: msg.role,
+                    parts: [{ text: msg.content }]
+                }))
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('API request failed');
+        }
+
+        const data = await response.json();
+        const botMessage = data.candidates[0].content.parts[0].text;
+        addMessage(botMessage, false);
+        
+        nextQuestionButton.style.display = 'inline-block';
+    } catch (error) {
+        console.error('Error:', error);
+        addMessage('Sorry, I encountered an error. Please try again.', false);
+    }
+}
+
+async function handleFile(file) {
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, {type: 'array'});
+        
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        
+        excelData = XLSX.utils.sheet_to_json(worksheet);
+        
+        console.log('Excel data loaded:', excelData);
+        
+        fileUploadArea.style.display = 'none';
+        chatContainer.style.display = 'flex';
+        
+        addMessage("Excel file loaded. Processing questions...", false);
+        
+        await processQuestion(currentQuestionIndex);
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+async function processQuestion(index) {
+    if (index >= excelData.length) {
+        addMessage('All questions processed.', false);
+        return;
+    }
+
+    const question = excelData[index].Question; // Assuming 'Question' is the column name
+    if (question) {
+        chatHistory = []; // Clear chat history for new question
+        addMessage(`Q: ${question}`, true);
+        
+        const answer = await queryGemini(question);
+        excelData[index].Answer = answer;
+        addMessage(`A: ${answer}`, false);
+        
+        nextQuestionButton.style.display = 'inline-block';
+    }
+}
+
+async function queryGemini(question) {
+    try {
+        const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [
+                    {
+                        role: 'user',
+                        parts: [{ text: question }]
+                    }
+                ]
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('API request failed');
+        }
+
+        const data = await response.json();
+        return data.candidates[0].content.parts[0].text;
+    } catch (error) {
+        console.error('Error:', error);
+        return 'Sorry, I encountered an error processing this question.';
+    }
+}
+
+sendButton.addEventListener('click', sendMessage);
+userInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
+
+fileUploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = 'copy';
+});
+
+fileUploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        handleFile(files[0]);
+    }
+});
+
+selectFileButton.addEventListener('click', () => {
+    fileInput.click();
+});
+
+fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+        handleFile(e.target.files[0]);
+    }
+});
+
+nextQuestionButton.addEventListener('click', async () => {
+    nextQuestionButton.style.display = 'none';
+    currentQuestionIndex++;
+    await processQuestion(currentQuestionIndex);
+});
